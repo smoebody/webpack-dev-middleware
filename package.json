@@ -44,6 +44,7 @@
     "lint": "eslint *.js lib test",
     "posttest": "npm run -s lint",
     "test": "mocha --full-trace --check-leaks",
+    "test:inspect-brk": "mocha --inspect-brk=0.0.0.0:9229 --full-trace --check-leaks",
     "beautify": "npm run lint -- --fix",
     "cover": "istanbul cover node_modules/mocha/bin/_mocha",
     "travis": "npm run cover -- --report lcovonly && npm run lint"

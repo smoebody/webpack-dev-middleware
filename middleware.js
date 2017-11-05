@@ -43,18 +43,14 @@ module.exports = function(compiler, options) {
 		return new Promise(function(resolve) {
 			shared.handleRequest(filename, processRequest, req);
 			function processRequest() {
+				var index = (context.options.index === undefined || context.options.index === true)
+					? "index.html"
+					:	context.options.index;
+
 				try {
 					var stat = context.fs.statSync(filename);
 					if(!stat.isFile()) {
 						if(stat.isDirectory()) {
-							var index = context.options.index;
-
-							if(index === undefined || index === true) {
-								index = "index.html";
-							} else if(!index) {
-								throw "next";
-							}
-
 							filename = pathJoin(filename, index);
 							stat = context.fs.statSync(filename);
 							if(!stat.isFile()) throw "next";
@@ -63,7 +59,14 @@ module.exports = function(compiler, options) {
 						}
 					}
 				} catch(e) {
-					return resolve(goNext());
+					if(e.code === "ENOENT" && context.options.catchAll === true) {
+						filename = getFilenameFromUrl(context.options.publicPath, context.compiler, context.options.publicPath);
+						filename = pathJoin(filename, index);
+						stat = context.fs.statSync(filename);
+						if(stat.isFile()) resolve(goNext());
+					} else {
+						return resolve(goNext());
+					}
 				}
 
 				// server content

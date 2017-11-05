@@ -74,6 +74,10 @@ app.use(webpackMiddleware(webpack({
 	// The index path for web server, defaults to "index.html".
 	// If falsy (but not undefined), the server will not respond to requests to the root URL.
 
+	catchAll: false,
+	// whether all unresolved requests shall be catched by `${publicPath}/${index}`. Defaults to `false`
+	// useful in html5-mode where routing is done by clientside JavaScript (e.g. angular-route)
+
 	headers: { "X-Custom-Header": "yes" },
 	// custom headers
 

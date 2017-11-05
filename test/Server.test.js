@@ -240,4 +240,29 @@ describe("Server", function() {
 				});
 		});
 	});
+
+	describe("catch-all handler", function() {
+		before(function(done) {
+			app = express();
+			var compiler = webpack(webpackConfig);
+			var instance = middleware(compiler, {
+				stats: "errors-only",
+				quiet: true,
+				publicPath: "/public/",
+				catchAll: true
+			});
+			app.use(instance);
+			listen = listenShorthand(done);
+			// Hack to add a mock HMR json file to the in-memory filesystem.
+			instance.fileSystem.writeFileSync("/123a123412.hot-update.json", "[\"hi\"]");
+		});
+		after(close);
+
+		it("request to nope", function(done) {
+			request(app).get("/public/nope")
+				.expect("Content-Type", "text/html; charset=UTF-8")
+				.expect("Content-Length", "10")
+				.expect(200, /My\ Index\./, done);
+		});
+	});
 });
